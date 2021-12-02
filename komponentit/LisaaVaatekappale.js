@@ -7,24 +7,40 @@ import { getFirestore, setDoc, doc, collection, getDocs, onSnapshot, itemsSnapsh
 import 'firebase/firestore';
 import takki from '../assets/takki.png'
 import { useForm, Controller } from "react-hook-form";
-import { Input, Button, ListItem, Header, Avatar } from
-    'react-native-elements';
-import Firebase from './Tietokanta';
-
+import { Input, Button, ListItem, Header, Avatar } from 'react-native-elements';
+import db from './Tietokanta';
 
 function LisaaVaatekappale() {
+    let pvm = new Date();
+    let pvmSTR = pvm.getDate() +"."  + (pvm.getMonth()+1)+"." + pvm.getFullYear();
+    console.log(pvmSTR);
+
     const { control, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
             kategoria: '',
             lapsi: '',
             pituudelle:'',
             kuvaus:'',
+            lisattypvm:''
         }
     });
 
+    async function postVaatekappale(data){
+        console.log('posting');
+        
+        let dataSTR = JSON.stringify(data);
+        console.log(dataSTR);
+       await addDoc(collection(db,'vaatekappaleet'),data);
+    }
+
     const onSubmit = data => {
-        console.log(data);
-        reset()
+        let pvm = new Date();
+        let pvmSTR = pvm.getDate() +"."  + (pvm.getMonth()+1)+"." + pvm.getFullYear();
+        console.log(pvmSTR);
+        data.lisattypvm = pvmSTR;
+        console.log(JSON.stringify(data));
+        postVaatekappale(data);
+        // reset()
     }
 
     return (
@@ -96,11 +112,9 @@ function LisaaVaatekappale() {
             />
 
             <Button title="Submit" onPress={handleSubmit(onSubmit)} />
-            <Button title="Submit" onPress={reset} />
         </View>
     );
 }
-
 
 const styles = StyleSheet.create({
     container: {
